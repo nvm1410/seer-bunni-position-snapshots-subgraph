@@ -1,0 +1,572 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "factory_",
+        "type": "address",
+        "internalType": "contract IUniswapV3Factory"
+      },
+      { "name": "owner_", "type": "address", "internalType": "address" },
+      { "name": "protocolFee_", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  { "name": "T", "type": "error", "inputs": [] },
+  {
+    "name": "Compound",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "bunniKeyHash",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "liquidity",
+        "type": "uint128",
+        "indexed": false,
+        "internalType": "uint128"
+      },
+      {
+        "name": "amount0",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount1",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "Deposit",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "recipient",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "bunniKeyHash",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "liquidity",
+        "type": "uint128",
+        "indexed": false,
+        "internalType": "uint128"
+      },
+      {
+        "name": "amount0",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount1",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "shares",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "NewBunni",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "indexed": true,
+        "internalType": "contract IBunniToken"
+      },
+      {
+        "name": "bunniKeyHash",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "pool",
+        "type": "address",
+        "indexed": true,
+        "internalType": "contract IUniswapV3Pool"
+      },
+      {
+        "name": "tickLower",
+        "type": "int24",
+        "indexed": false,
+        "internalType": "int24"
+      },
+      {
+        "name": "tickUpper",
+        "type": "int24",
+        "indexed": false,
+        "internalType": "int24"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "OwnerUpdated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "PayProtocolFee",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "amount0",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount1",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "SetProtocolFee",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "newProtocolFee",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "Withdraw",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "recipient",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "bunniKeyHash",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "liquidity",
+        "type": "uint128",
+        "indexed": false,
+        "internalType": "uint128"
+      },
+      {
+        "name": "amount0",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount1",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "shares",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "compound",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "pool",
+            "type": "address",
+            "internalType": "contract IUniswapV3Pool"
+          },
+          { "name": "tickLower", "type": "int24", "internalType": "int24" },
+          { "name": "tickUpper", "type": "int24", "internalType": "int24" }
+        ],
+        "internalType": "struct BunniKey"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "addedLiquidity",
+        "type": "uint128",
+        "internalType": "uint128"
+      },
+      { "name": "amount0", "type": "uint256", "internalType": "uint256" },
+      { "name": "amount1", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "deployBunniToken",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "pool",
+            "type": "address",
+            "internalType": "contract IUniswapV3Pool"
+          },
+          { "name": "tickLower", "type": "int24", "internalType": "int24" },
+          { "name": "tickUpper", "type": "int24", "internalType": "int24" }
+        ],
+        "internalType": "struct BunniKey"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "contract IBunniToken"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "deposit",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "key",
+            "type": "tuple",
+            "components": [
+              {
+                "name": "pool",
+                "type": "address",
+                "internalType": "contract IUniswapV3Pool"
+              },
+              { "name": "tickLower", "type": "int24", "internalType": "int24" },
+              { "name": "tickUpper", "type": "int24", "internalType": "int24" }
+            ],
+            "internalType": "struct BunniKey"
+          },
+          {
+            "name": "amount0Desired",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "amount1Desired",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "amount0Min",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "amount1Min",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          { "name": "deadline", "type": "uint256", "internalType": "uint256" },
+          { "name": "recipient", "type": "address", "internalType": "address" }
+        ],
+        "internalType": "struct IBunniHub.DepositParams"
+      }
+    ],
+    "outputs": [
+      { "name": "shares", "type": "uint256", "internalType": "uint256" },
+      {
+        "name": "addedLiquidity",
+        "type": "uint128",
+        "internalType": "uint128"
+      },
+      { "name": "amount0", "type": "uint256", "internalType": "uint256" },
+      { "name": "amount1", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "name": "factory",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IUniswapV3Factory"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "getBunniToken",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "pool",
+            "type": "address",
+            "internalType": "contract IUniswapV3Pool"
+          },
+          { "name": "tickLower", "type": "int24", "internalType": "int24" },
+          { "name": "tickUpper", "type": "int24", "internalType": "int24" }
+        ],
+        "internalType": "struct BunniKey"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "contract IBunniToken"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "multicall",
+    "type": "function",
+    "inputs": [
+      { "name": "data", "type": "bytes[]", "internalType": "bytes[]" }
+    ],
+    "outputs": [
+      { "name": "results", "type": "bytes[]", "internalType": "bytes[]" }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "name": "owner",
+    "type": "function",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "name": "protocolFee",
+    "type": "function",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "name": "selfPermit",
+    "type": "function",
+    "inputs": [
+      { "name": "token", "type": "address", "internalType": "address" },
+      { "name": "value", "type": "uint256", "internalType": "uint256" },
+      { "name": "deadline", "type": "uint256", "internalType": "uint256" },
+      { "name": "v", "type": "uint8", "internalType": "uint8" },
+      { "name": "r", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "s", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "name": "selfPermitAllowed",
+    "type": "function",
+    "inputs": [
+      { "name": "token", "type": "address", "internalType": "address" },
+      { "name": "nonce", "type": "uint256", "internalType": "uint256" },
+      { "name": "expiry", "type": "uint256", "internalType": "uint256" },
+      { "name": "v", "type": "uint8", "internalType": "uint8" },
+      { "name": "r", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "s", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "name": "selfPermitAllowedIfNecessary",
+    "type": "function",
+    "inputs": [
+      { "name": "token", "type": "address", "internalType": "address" },
+      { "name": "nonce", "type": "uint256", "internalType": "uint256" },
+      { "name": "expiry", "type": "uint256", "internalType": "uint256" },
+      { "name": "v", "type": "uint8", "internalType": "uint8" },
+      { "name": "r", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "s", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "name": "selfPermitIfNecessary",
+    "type": "function",
+    "inputs": [
+      { "name": "token", "type": "address", "internalType": "address" },
+      { "name": "value", "type": "uint256", "internalType": "uint256" },
+      { "name": "deadline", "type": "uint256", "internalType": "uint256" },
+      { "name": "v", "type": "uint8", "internalType": "uint8" },
+      { "name": "r", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "s", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "name": "setOwner",
+    "type": "function",
+    "inputs": [
+      { "name": "newOwner", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "setProtocolFee",
+    "type": "function",
+    "inputs": [
+      { "name": "value", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "sweepTokens",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "tokenList",
+        "type": "address[]",
+        "internalType": "contract IERC20[]"
+      },
+      { "name": "recipient", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "uniswapV3MintCallback",
+    "type": "function",
+    "inputs": [
+      { "name": "amount0Owed", "type": "uint256", "internalType": "uint256" },
+      { "name": "amount1Owed", "type": "uint256", "internalType": "uint256" },
+      { "name": "data", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "withdraw",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "key",
+            "type": "tuple",
+            "components": [
+              {
+                "name": "pool",
+                "type": "address",
+                "internalType": "contract IUniswapV3Pool"
+              },
+              { "name": "tickLower", "type": "int24", "internalType": "int24" },
+              { "name": "tickUpper", "type": "int24", "internalType": "int24" }
+            ],
+            "internalType": "struct BunniKey"
+          },
+          { "name": "recipient", "type": "address", "internalType": "address" },
+          { "name": "shares", "type": "uint256", "internalType": "uint256" },
+          {
+            "name": "amount0Min",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "amount1Min",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          { "name": "deadline", "type": "uint256", "internalType": "uint256" }
+        ],
+        "internalType": "struct IBunniHub.WithdrawParams"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "removedLiquidity",
+        "type": "uint128",
+        "internalType": "uint128"
+      },
+      { "name": "amount0", "type": "uint256", "internalType": "uint256" },
+      { "name": "amount1", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "nonpayable"
+  }
+]

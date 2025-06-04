@@ -1,0 +1,8 @@
+{
+  "mainnet": {
+    "BunniHub": {
+      "address": "0xb5087f95643a9a4069471a28d32c569d9bd57fe4",
+      "startBlock": 15743582
+    }
+  }
+}
