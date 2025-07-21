@@ -1,77 +1,42 @@
-type Compound @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
+type Token @entity(immutable: false) {
+  id: ID! # token address
+  totalSupply: BigInt!
   bunniKeyHash: Bytes! # bytes32
-  liquidity: BigInt! # uint128
-  amount0: BigInt! # uint256
-  amount1: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Deposit @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  recipient: Bytes! # address
-  bunniKeyHash: Bytes! # bytes32
-  liquidity: BigInt! # uint128
-  amount0: BigInt! # uint256
-  amount1: BigInt! # uint256
-  shares: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type NewBunni @entity(immutable: true) {
-  id: Bytes!
-  token: Bytes! # address
-  bunniKeyHash: Bytes! # bytes32
-  pool: Bytes! # address
+  pool: Bytes! # address of Uniswap V3 pool
   tickLower: Int! # int24
   tickUpper: Int! # int24
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  transfers: [Transfer!]! @derivedFrom(field: "token")
 }
 
-type OwnerUpdated @entity(immutable: true) {
-  id: Bytes!
-  user: Bytes! # address
-  newOwner: Bytes! # address
+type TotalSupplySnapshot @entity(immutable: true) {
+  id: ID!
+  token: Token!
+  totalSupply: BigInt!
+  timestamp: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
 }
 
-type PayProtocolFee @entity(immutable: true) {
-  id: Bytes!
-  amount0: BigInt! # uint256
-  amount1: BigInt! # uint256
+type PositionSnapshot @entity(immutable: true) {
+  id: ID!
+  token: Token!
+  transfer: Transfer!
+  totalSupply: BigInt!
+  timestamp: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+
+  # pool data
+  tick: BigInt
+  liquidity: BigInt
+  token0: Bytes
+  token1: Bytes
 }
 
-type SetProtocolFee @entity(immutable: true) {
-  id: Bytes!
-  newProtocolFee: BigInt! # uint256
+type Transfer @entity(immutable: true) {
+  id: ID! # Transaction hash + log index
+  token: Token!
+  from: Bytes! # Address
+  to: Bytes! # Address
+  value: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Withdraw @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  recipient: Bytes! # address
-  bunniKeyHash: Bytes! # bytes32
-  liquidity: BigInt! # uint128
-  amount0: BigInt! # uint256
-  amount1: BigInt! # uint256
-  shares: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  timestamp: BigInt!
 }
